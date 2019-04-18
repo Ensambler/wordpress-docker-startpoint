@@ -1,72 +1,94 @@
 #!/bin/sh
 
 
+# SETTINGS
+# (required)
 REPOSITORY_URL="https://github.com/Ensambler/emblr-official-site"
 
-PROJECT_NAME="Nombre del Proyecto"	# optional
-PROJECT_ALIAS="emblr-site"	#optional
-STACK="Wordpress, MySQL, PHP, SASS, HTML5, JS"	# optional
-DEVELOPERS="Diego Ulloa Ormeño, Paul Joseph Pineda, Álvaro Arriagada Ortega"	# optional
-DEPLOY_BRANCH="desarrollo"	# optional
-PROJECT_URL="http://www.ensambler.cl/"	# optional
+# (optional)
+PROJECT_NAME="Nombre del Proyecto"
+PROJECT_ALIAS="emblr-site"
+STACK="Wordpress, MySQL, PHP, SASS, HTML5, JS"
+DEVELOPERS="Diego Ulloa Ormeño, Paul Joseph Pineda, Álvaro Arriagada Ortega"
+DEPLOY_BRANCH="desarrollo"
+PROJECT_URL="http://www.ensambler.cl/"
 
+
+# --------------------------------------------------------------------------
+
+
+# DEFAULT
+PROJECT_NAME_DEFAULT=$(sed 's/-/ /g' <<< ${REPOSITORY_URL##*/})
+STACK_DEFAULT="Wordpress, MySQL, PHP"
+DEVELOPERS_DEFAULT="Ensambler"
+DEPLOY_BRANCH_DEFAULT="master"
+PROJECT_URL_DEFAULT="http://www.ensambler.cl/"
+
+
+# GENERATED
 REPOSITORY_DIR="${REPOSITORY_URL##*/}"
-
+# (containers)
 DB_CONTAINER_NAME="${REPOSITORY_DIR}-db"
 PHPMYADMIN_CONTAINER_NAME="${REPOSITORY_DIR}-phpmyadmin"
 WP_CONTAINER_NAME="${REPOSITORY_DIR}-wp"
-
-INSTALL_RAW_URL="$(sed "s/github.com/raw.githubusercontent.com/g" <<< $REPOSITORY_URL)/${DEPLOY_BRANCH:="master"}/install"
+# (urls)
+INSTALL_RAW_URL="$(sed "s/github.com/raw.githubusercontent.com/g" <<< $REPOSITORY_URL)/${DEPLOY_BRANCH:=$DEPLOY_BRANCH_DEFAULT}/install"
 INSTALL_SHORT_URL=$(curl -s -i https://git.io -F "url=$INSTALL_RAW_URL" | grep Location)
 INSTALL_SHORT_URL=$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${INSTALL_SHORT_URL#*: *})
 
-# hook files
-#sed "s/@db_container_name/$DB_CONTAINER_NAME/g" .git-hooks_/pre-commit > .temp
-#cat .temp > .git-hooks_/pre-commit
 
-#sed "s/@db_container_name/$DB_CONTAINER_NAME/g" .git-hooks_/post-merge > .temp
-#cat .temp > .git-hooks_/post-merge
+# .git-hooks files
+sed "s/@db_container_name/$DB_CONTAINER_NAME/g" .git-hooks_/pre-commit > .temp
+cat .temp > .git-hooks_/pre-commit
+
+sed "s/@db_container_name/$DB_CONTAINER_NAME/g" .git-hooks_/post-merge > .temp
+cat .temp > .git-hooks_/post-merge
+
 
 # install file
-#sed "
-#	s,@repository_url,$REPOSITORY_URL,g;
-#	s,@repository_dir,$REPOSITORY_DIR,g;
-#	s,@db_container_name,$DB_CONTAINER_NAME,g
-#" install_ > .temp
+sed "
+	s,@repository_url,$REPOSITORY_URL,g;
+	s,@repository_dir,$REPOSITORY_DIR,g;
+	s,@db_container_name,$DB_CONTAINER_NAME,g
+" install_ > .temp
 
-#cat .temp > install_
+cat .temp > install_
 
-# docker-compose file
-#sed "
-#	s/@db_container_name/$DB_CONTAINER_NAME/g;
-#	s/@phpmyadmin_container_name/$PHPMYADMIN_CONTAINER_NAME/g;
-#	s/@wp_container_name/$WP_CONTAINER_NAME/g
-#" docker-compose_.yml > .temp
 
-#cat .temp > docker-compose_.yml
+# docker-compose.yml file
+sed "
+	s/@db_container_name/$DB_CONTAINER_NAME/g;
+	s/@phpmyadmin_container_name/$PHPMYADMIN_CONTAINER_NAME/g;
+	s/@wp_container_name/$WP_CONTAINER_NAME/g
+" docker-compose_.yml > .temp
 
-# README-sample file
-DEVELOPERS=${DEVELOPERS:="Ensambler"}","
+cat .temp > docker-compose_.yml
+
+
+# README-sample.md file
+DEVELOPERS=${DEVELOPERS:=$DEVELOPERS_DEFAULT}","
 DEVELOPER_LIST=""
 
 while [[ $DEVELOPERS ]]
 do
-    DEVELOPER_LIST+="- "$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${DEVELOPERS%%","*})".\\
-    "
-    DEVELOPERS=${DEVELOPERS#*","}
+   DEVELOPER_LIST+="- "$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${DEVELOPERS%%","*})".\\
+   "
+   DEVELOPERS=${DEVELOPERS#*","}
 done
+
 # sacar globales
 sed "
-	s,@project_name,${PROJECT_NAME:=$(sed 's/-/ /g' <<< $REPOSITORY_DIR)},g;
+	s,@project_name,${PROJECT_NAME:=$PROJECT_NAME_DEFAULT},g;
 	s,@developers,$DEVELOPER_LIST,g;
 	s,@install_url,$INSTALL_SHORT_URL,g;
 	s,@repository_dir,$REPOSITORY_DIR,g;
 	s,@project_alias,${PROJECT_ALIAS:=$REPOSITORY_DIR},g;
-	s,@project_url,${PROJECT_URL:="http://www.ensambler.cl/"},g;
-	s/@stack/${STACK:="Wordpress, MySQL, PHP"}/g;
+	s,@project_url,${PROJECT_URL:=$PROJECT_URL_DEFAULT},g;
+	s/@stack/${STACK:=$STACK_DEFAULT}/g;
 	s/@year/$(date +"%Y")/g
 " README-sample_.md > .temp
 
 cat .temp > README-sample_.md
+
 
 rm .temp
