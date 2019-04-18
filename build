@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo $2
+exit
 
 # SETTINGS
 # (required)
@@ -38,11 +40,11 @@ INSTALL_SHORT_URL=$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${INSTALL_SHO
 
 
 # .git-hooks files
-sed "s/@db_container_name/$DB_CONTAINER_NAME/g" .git-hooks_/pre-commit > .temp
-cat .temp > .git-hooks_/pre-commit
+sed "s/@db_container_name/$DB_CONTAINER_NAME/g" .ensambler/src/git-hooks_/pre-commit > .ensambler/.temp
+cat .ensambler/.temp > .ensambler/src/git-hooks_/pre-commit
 
-sed "s/@db_container_name/$DB_CONTAINER_NAME/g" .git-hooks_/post-merge > .temp
-cat .temp > .git-hooks_/post-merge
+sed "s/@db_container_name/$DB_CONTAINER_NAME/g" .ensambler/src/git-hooks_/post-merge > .ensambler/.temp
+cat .ensambler/.temp > .ensambler/src/git-hooks_/post-merge
 
 
 # install file
@@ -50,9 +52,9 @@ sed "
 	s,@repository_url,$REPOSITORY_URL,g;
 	s,@repository_dir,$REPOSITORY_DIR,g;
 	s,@db_container_name,$DB_CONTAINER_NAME,g
-" install_ > .temp
+" install_ > .ensambler/.temp
 
-cat .temp > install_
+cat .ensambler/.temp > install_
 
 
 # docker-compose.yml file
@@ -60,9 +62,9 @@ sed "
 	s/@db_container_name/$DB_CONTAINER_NAME/g;
 	s/@phpmyadmin_container_name/$PHPMYADMIN_CONTAINER_NAME/g;
 	s/@wp_container_name/$WP_CONTAINER_NAME/g
-" docker-compose_.yml > .temp
+" docker-compose_.yml > .ensambler/.temp
 
-cat .temp > docker-compose_.yml
+cat .ensambler/.temp > docker-compose_.yml
 
 
 # README-sample.md file
@@ -86,9 +88,9 @@ sed "
 	s,@project_url,${PROJECT_URL:=$PROJECT_URL_DEFAULT},g;
 	s/@stack/${STACK:=$STACK_DEFAULT}/g;
 	s/@year/$(date +"%Y")/g
-" README-sample_.md > .temp
+" .ensambler/src/README-sample_.md > .ensambler/.temp
 
-cat .temp > README-sample_.md
+cat .ensambler/.temp > .ensambler/src/README-sample_.md
 
 
-rm .temp
+rm .ensambler/.temp
