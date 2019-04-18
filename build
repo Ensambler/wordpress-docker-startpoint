@@ -6,7 +6,7 @@ REPOSITORY_URL="https://github.com/Ensambler/emblr-official-site"
 PROJECT_NAME="Nombre del Proyecto"	# optional
 PROJECT_ALIAS="emblr-site"	#optional
 STACK="Wordpress, MySQL, PHP, SASS, HTML5, JS"	# optional
-DEVELOPERS="Diego Ulloa Ormeño, Paul Joseph Pineda, Álvaro Arriagada Ortega"
+DEVELOPERS="Diego Ulloa Ormeño, Paul Joseph Pineda, Álvaro Arriagada Ortega"	# optional
 DEPLOY_BRANCH="desarrollo"	# optional
 PROJECT_URL="http://www.ensambler.cl/"	# optional
 
@@ -46,9 +46,19 @@ INSTALL_SHORT_URL=$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${INSTALL_SHO
 #cat .temp > docker-compose_.yml
 
 # README-sample file
+DEVELOPERS=${DEVELOPERS:="Ensambler"}","
+DEVELOPER_LIST=""
+
+while [[ $DEVELOPERS ]]
+do
+    DEVELOPER_LIST+="- "$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${DEVELOPERS%%","*})".\\
+    "
+    DEVELOPERS=${DEVELOPERS#*","}
+done
+# sacar globales
 sed "
 	s,@project_name,${PROJECT_NAME:=$(sed 's/-/ /g' <<< $REPOSITORY_DIR)},g;
-	s/@developers/${DEVELOPERS:="- Ensambler."}/g;
+	s,@developers,$DEVELOPER_LIST,g;
 	s,@install_url,$INSTALL_SHORT_URL,g;
 	s,@repository_dir,$REPOSITORY_DIR,g;
 	s,@project_alias,${PROJECT_ALIAS:=$REPOSITORY_DIR},g;

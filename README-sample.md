@@ -1,48 +1,46 @@
 # Ensambler®
 
-- **Desarrollo:** "[nombre desarrollo]".
+- **Desarrollo:** "@project_name".
 - **Desarrolladores:**
-	- [desarrollador 1].
-	- [desarrollador 2].
-	- [desarrollador 3].
-- **Stack:** Wordpress, MySQL, PHP, CSS, JS, HTML5.
+	@developers
+- **Stack:** @stack.
 - **Servicios:** Wordpress, MySQL, phpMyAdmin.
-- **Año:** 2019.
+- **Año:** @year.
 
 ## Paso 1. Instalación Proyecto en Entorno local.
 
 Abrir Terminal, navegar hasta directorio personal de Proyectos y ejecutar:
 
 ```bash
-curl -L [url install.sh] | sh
+curl -L @install_url | sh
 ```
 
 ## Paso 2. Levantar Servicios.
 
-En directorio del proyecto "[nombre repositorio]" ejecutar:
+En directorio del proyecto "@repository_dir" ejecutar:
 
 ```
-docker-compuse up
+docker-compose up
 ```
 
 --
 
 ### Opcional:
-Añadir alias **"[alias proyecto]"** al bash_profile para acceder directamente al directorio de trabajo.
+Añadir alias **"@project_alias"** al bash_profile para acceder directamente al directorio de trabajo.
 *(Reemplazar ".bash_profile" por el archivo bash indicado en caso de ser necesario).*
 
 En Terminal:
 ```
-echo "alias '[alias proyecto]'='cd `pwd`'" >> ~/.bash_profile && source ~/.bash_profile
+echo "alias '@project_alias'='cd `pwd`'" >> ~/.bash_profile && source ~/.bash_profile
 ```
 Uso:
 ```
-[alias proyecto]
+@project_alias
 ```
 
 --
 
-URL: [url proyecto]
+URL: @project_url
 --
 
 Ensambler® 2019. Ingeniería de Software para Soluciones Empresariales Integradas.
