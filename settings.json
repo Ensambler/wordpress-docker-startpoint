@@ -1,4 +1,18 @@
 {
-  "name": "sample-project",
-  "description": "A great project"
+
+	// @required
+	"Repository_URL": "https://github.com/Ensambler/emblr-official-site",
+
+
+	// @optional
+	"Name": "sample-project",
+	"Description": "A great project",
+	"Stack": "Wordpress, MySQL, PHP",
+	"Developers": "Steve Jobs, Bill Gates, Me",
+
+	"URL": "una-url",	// default 'www.ensambler.cl'
+
+	"Project_alias": "alias aqui",	// default :repository-name
+	"Deploy_branch": "desarrollo",
+
 }

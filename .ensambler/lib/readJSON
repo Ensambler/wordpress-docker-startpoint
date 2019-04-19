@@ -6,13 +6,13 @@ function readJson {
     SED_EXTENDED='-E'
   fi; 
 
-  VALUE=`grep -m 1 "\"${2}\"" ${1} | sed ${SED_EXTENDED} 's/^ *//;s/.*: *"//;s/",?//'`
+  VALUE=`grep -m 1 "\"${2}\"" ${1} | sed ${SED_EXTENDED} 's/^ *//; s/.*: *"//; s/",?//'`
 
-  if [ ! "$VALUE" ]; then
+  if [ ! "$VALUE" ] && [ "$3" != "--optional" ]; then
     echo "Error: Cannot find \"${2}\" in ${1}" >&2;
     exit 1;
   else
-    echo $VALUE ;
+    echo $VALUE;
   fi; 
 }
 
