@@ -1,7 +1,5 @@
 #!/bin/sh
 
-echo $2
-exit
 
 # SETTINGS
 # (required)
