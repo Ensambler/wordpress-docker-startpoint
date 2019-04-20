@@ -1,2 +1,0 @@
-docker exec -i @db_container_name /usr/bin/mysqldump -u wordpress --password=wordpress wordpress > mysql.sql
-git add mysql.sql

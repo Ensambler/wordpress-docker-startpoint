@@ -4,11 +4,32 @@ source .ensambler/lib/readJSON
 source .ensambler/lib/gitChecker
 
 
+# DEFINE PARAMS
+while [[ $# > 0 ]] ; do
+    case "$1" in
+        -f | --for )
+            shift
+            declare REPOSITORY_URL="$1"
+            shift
+        ;;
+
+        -d | --deploy )
+            shift
+            declare deploy=true
+        ;;
+
+        * )
+            shift
+        ;;
+    esac
+done
+
+
 # SETTINGS.json
 # --------------------------------------------------------------------------
 
 # (required)
-REPOSITORY_URL=`readJson settings.json Repository_URL` || exit
+REPOSITORY_URL=${REPOSITORY_URL:=`readJson settings.json Repository_URL`} || exit
 
 # (check if repository is reachable)
 `gitChecker $REPOSITORY_URL` || exit
@@ -52,11 +73,11 @@ INSTALL_RAW_URL="$(sed "s/github.com/raw.githubusercontent.com/g" <<< $REPOSITOR
 # --------------------------------------------------------------------------
 
 # .git-hooks files
-sed "s/@db_container_name/$DB_CONTAINER_NAME/" .ensambler/src/git-hooks_/pre-commit > .ensambler/.temp
-#cat .ensambler/.temp > .ensambler/src/git-hooks_/pre-commit
+sed "s/@db_container_name/$DB_CONTAINER_NAME/" .ensambler/src/git-hooks/pre-commit > .ensambler/.temp
+#cat .ensambler/.temp > .ensambler/src/git-hooks/pre-commit
 
-sed "s/@db_container_name/$DB_CONTAINER_NAME/" .ensambler/src/git-hooks_/post-merge > .ensambler/.temp
-#cat .ensambler/.temp > .ensambler/src/git-hooks_/post-merge
+sed "s/@db_container_name/$DB_CONTAINER_NAME/" .ensambler/src/git-hooks/post-merge > .ensambler/.temp
+#cat .ensambler/.temp > .ensambler/src/git-hooks/post-merge
 
 
 # install file
@@ -64,9 +85,9 @@ sed "
 	s,@repository_url,$REPOSITORY_URL,;
 	s,@repository_dir,$REPOSITORY_DIR,;
 	s,@db_container_name,$DB_CONTAINER_NAME,
-" install_ > .ensambler/.temp
+" install > .ensambler/.temp
 
-#cat .ensambler/.temp > install_
+#cat .ensambler/.temp > install
 
 
 # docker-compose.yml file
@@ -74,9 +95,9 @@ sed "
 	s/@db_container_name/$DB_CONTAINER_NAME/;
 	s/@phpmyadmin_container_name/$PHPMYADMIN_CONTAINER_NAME/;
 	s/@wp_container_name/$WP_CONTAINER_NAME/
-" docker-compose_.yml > .ensambler/.temp
+" docker-compose.yml > .ensambler/.temp
 
-#cat .ensambler/.temp > docker-compose_.yml
+#cat .ensambler/.temp > docker-compose.yml
 
 
 # README-sample.md file
@@ -98,9 +119,9 @@ sed "
 	s,@project_url,${PROJECT_URL:=$PROJECT_URL_DEFAULT},;
 	s/@stack/${STACK:=$STACK_DEFAULT}/;
 	s/@year/$(date +"%Y")/
-" .ensambler/src/README-sample_.md > .ensambler/.temp
+" .ensambler/src/README-template.md > .ensambler/.temp
 
-#cat .ensambler/.temp > .ensambler/src/README-sample_.md
+#cat .ensambler/.temp > .ensambler/src/README-template.md
 
 # --------------------------------------------------------------------------
 
