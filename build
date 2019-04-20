@@ -85,7 +85,7 @@ DEVELOPER_LIST=""
 
 while [[ $DEVELOPERS ]] ; do
 	DEVELOPER_LIST+="- "$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${DEVELOPERS%%","*})".\\
-	" # just for new line.
+	" # new line.
 	DEVELOPERS=${DEVELOPERS#*","}
 done
 
@@ -107,9 +107,14 @@ sed "
 
 rm .ensambler/.temp
 
+# just macOs
+echo "curl -L" ${INSTALL_SHORT_URL:=$INSTALL_RAW_URL} "| sh" | pbcopy
+
 echo "
-Project \"$REPOSITORY_DIR\" got Ensambled.
-Let's do something great ;)
+Project * $REPOSITORY_DIR * got Ensambled!
+SHARE IT TO YOUR TEAM: ${INSTALL_SHORT_URL:=$INSTALL_RAW_URL} (copied to clipboard).
 "
 
 exit 0
+
+#done.
