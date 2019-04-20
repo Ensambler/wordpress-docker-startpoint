@@ -1,0 +1,13 @@
+function gitChecker {
+
+	function check {
+		git ls-remote "$1" CHECK_GIT_REMOTE_URL_REACHABILITY > /dev/null 2>&1
+	}
+
+
+	if ! `check $1`; then
+   		echo "Error: You don't have the permissions over repository \"${1##*/}\" from $(echo ${1#*.com/} | sed 's,'/${1##*/}',,') or it doesn't exists ( $1 )" >&2
+		exit 1
+	fi
+
+}

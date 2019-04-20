@@ -1,13 +1,17 @@
 #!/bin/sh
 
 source .ensambler/lib/readJSON
+source .ensambler/lib/gitChecker
 
 
 # SETTINGS.json
 # --------------------------------------------------------------------------
 
 # (required)
-REPOSITORY_URL=`readJson settings.json Repository_URL` || #exit
+REPOSITORY_URL=`readJson settings.json Repository_URL` || exit
+
+# (check if repository is reachable)
+`gitChecker $REPOSITORY_URL` || exit
 
 # (optional)
 PROJECT_NAME=`readJson settings.json Name --optional`
@@ -17,15 +21,10 @@ DEVELOPERS=`readJson settings.json Developers --optional`
 DEPLOY_BRANCH=`readJson settings.json Deploy_branch --optional`
 PROJECT_URL=`readJson settings.json URL --optional`
 
-echo $REPOSITORY_URL
-echo $PROJECT_ALIAS
-
-exit
-# %//*
-# VARIABLES
-# --------------------------------------------------------------------------
 
 # DEFAULTS
+# --------------------------------------------------------------------------
+
 PROJECT_NAME_DEFAULT=$(sed 's/-/ /g' <<< ${REPOSITORY_URL##*/})
 STACK_DEFAULT="Wordpress, MySQL, PHP"
 DEVELOPERS_DEFAULT="Ensambler®"
@@ -34,6 +33,8 @@ PROJECT_URL_DEFAULT="http://www.ensambler.cl/"
 
 
 # GENERATED
+# --------------------------------------------------------------------------
+
 REPOSITORY_DIR="${REPOSITORY_URL##*/}"
 
 # (for containers)
@@ -43,10 +44,11 @@ WP_CONTAINER_NAME="${REPOSITORY_DIR}-wp"
 
 # (for urls)
 INSTALL_RAW_URL="$(sed "s/github.com/raw.githubusercontent.com/g" <<< $REPOSITORY_URL)/${DEPLOY_BRANCH:=$DEPLOY_BRANCH_DEFAULT}/install"
-INSTALL_SHORT_URL=$(curl -s -i https://git.io -F "url=$INSTALL_RAW_URL" | grep Location)
-INSTALL_SHORT_URL=$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${INSTALL_SHORT_URL#*: *})
+#INSTALL_SHORT_URL=$(curl -s -i https://git.io -F "url=$INSTALL_RAW_URL" | grep Location)
+#INSTALL_SHORT_URL=$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${INSTALL_SHORT_URL#*: *})
 
-# REPLACEMENTS
+
+# REPLACEMENTS: git-hooks/*, install, docker-compose.yml, README-sample.md
 # --------------------------------------------------------------------------
 
 # .git-hooks files
@@ -83,14 +85,14 @@ DEVELOPER_LIST=""
 
 while [[ $DEVELOPERS ]] ; do
 	DEVELOPER_LIST+="- "$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${DEVELOPERS%%","*})".\\
-	" # new line.
+	" # just for new line.
 	DEVELOPERS=${DEVELOPERS#*","}
 done
 
 sed "
 	s,@project_name,${PROJECT_NAME:=$PROJECT_NAME_DEFAULT},;
 	s,@developers,${DEVELOPER_LIST%\\*},;
-	s,@install_url,$INSTALL_SHORT_URL,;
+	s,@install_url,${INSTALL_SHORT_URL:=$INSTALL_RAW_URL},;
 	s,@repository_dir,$REPOSITORY_DIR,;
 	s,@project_alias,${PROJECT_ALIAS:=$REPOSITORY_DIR},g;
 	s,@project_url,${PROJECT_URL:=$PROJECT_URL_DEFAULT},;
@@ -103,4 +105,11 @@ sed "
 # --------------------------------------------------------------------------
 
 
-#rm .ensambler/.temp
+rm .ensambler/.temp
+
+echo "
+Project \"$REPOSITORY_DIR\" got Ensambled.
+Let's do something great ;)
+"
+
+exit 0

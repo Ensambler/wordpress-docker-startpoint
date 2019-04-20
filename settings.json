@@ -1,7 +1,7 @@
 {
 
 	// @required
-	"Repository_URL": "https://github.com/Ensambler/emblr-official-site",
+	"Repository_URL": "https://github.com/diegoulloao/new",
 
 
 	// @optional
@@ -10,9 +10,14 @@
 	"Stack": "Wordpress, MySQL, PHP",
 	"Developers": "Steve Jobs, Bill Gates, Me",
 
-	"URL": "una-url",	// default 'www.ensambler.cl'
+	"URL": "",
 
-	"Project_alias": "alias aqui",	// default :repository-name
-	"Deploy_branch": "desarrollo",
+	"Project_alias": "",
+	"Deploy_branch": "",
 
 }
+
+// https://github.com/diegoulloao/me-site
+// https://github.com/diegoulloao/new
+// https://github.com/diegoulloao/none
+// https://github.com/paulpopaul/tipsterweb
