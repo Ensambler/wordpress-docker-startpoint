@@ -1,10 +1,12 @@
 #!/bin/sh
 
-source .ensambler/lib/readJSON
-source .ensambler/lib/gitChecker
+environment="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+source $environment/.ensambler/lib/readJSON
+source $environment/.ensambler/lib/gitChecker
 
 
-# DEFINE PARAMS
+# DEFINE PARAMS PASSED
 while [[ $# > 0 ]] ; do
     case "$1" in
         -f | --for )
@@ -25,22 +27,22 @@ while [[ $# > 0 ]] ; do
 done
 
 
-# SETTINGS.json
+# PROJECT.json
 # --------------------------------------------------------------------------
 
 # (required)
-REPOSITORY_URL=${REPOSITORY_URL:=`readJson settings.json Repository_URL`} || exit
+REPOSITORY_URL=${REPOSITORY_URL:=`readJson $environment/project.json Repository_URL`} || exit
 
 # (check if repository is reachable)
 `gitChecker $REPOSITORY_URL` || exit
 
 # (optional)
-PROJECT_NAME=`readJson settings.json Name --optional`
-PROJECT_ALIAS=`readJson settings.json Project_alias --optional`
-STACK=`readJson settings.json Stack --optional`
-DEVELOPERS=`readJson settings.json Developers --optional`
-DEPLOY_BRANCH=`readJson settings.json Deploy_branch --optional`
-PROJECT_URL=`readJson settings.json URL --optional`
+PROJECT_NAME=`readJson $environment/project.json Name --optional`
+PROJECT_ALIAS=`readJson $environment/project.json Project_alias --optional`
+STACK=`readJson $environment/project.json Stack --optional`
+DEVELOPERS=`readJson $environment/project.json Developers --optional`
+DEPLOY_BRANCH=`readJson $environment/project.json Deploy_branch --optional`
+PROJECT_URL=`readJson $environment/project.json URL --optional`
 
 
 # DEFAULTS
@@ -64,30 +66,36 @@ PHPMYADMIN_CONTAINER_NAME="${REPOSITORY_DIR}-phpmyadmin"
 WP_CONTAINER_NAME="${REPOSITORY_DIR}-wp"
 
 # (for urls)
-INSTALL_RAW_URL="$(sed "s/github.com/raw.githubusercontent.com/g" <<< $REPOSITORY_URL)/${DEPLOY_BRANCH:=$DEPLOY_BRANCH_DEFAULT}/install"
-#INSTALL_SHORT_URL=$(curl -s -i https://git.io -F "url=$INSTALL_RAW_URL" | grep Location)
-#INSTALL_SHORT_URL=$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${INSTALL_SHORT_URL#*: *})
+MOUNT_RAW_URL="$(sed "s/github.com/raw.githubusercontent.com/g" <<< $REPOSITORY_URL)/${DEPLOY_BRANCH:=$DEPLOY_BRANCH_DEFAULT}/mount"
+#MOUNT_SHORT_URL=$(curl -s -i https://git.io -F "url=$MOUNT_RAW_URL" | grep Location)
+#MOUNT_SHORT_URL=$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< ${MOUNT_SHORT_URL#*: *})
 
 
-# REPLACEMENTS: git-hooks/*, install, docker-compose.yml, README-sample.md
+# USER
+# --------------------------------------------------------------------------
+
+USER_NAME=`git config --get user.name`
+
+
+# REPLACEMENTS: git-hooks/*, mount, docker-compose.yml, README-sample.md
 # --------------------------------------------------------------------------
 
 # .git-hooks files
-sed "s/@db_container_name/$DB_CONTAINER_NAME/" .ensambler/src/git-hooks/pre-commit > .ensambler/.temp
-#cat .ensambler/.temp > .ensambler/src/git-hooks/pre-commit
+sed "s/@db_container_name/$DB_CONTAINER_NAME/" $environment/.ensambler/src/git-hooks/pre-commit > $environment/.ensambler/.temp
+#cat $environment/.ensambler/.temp > $environment/.ensambler/src/git-hooks/pre-commit
 
-sed "s/@db_container_name/$DB_CONTAINER_NAME/" .ensambler/src/git-hooks/post-merge > .ensambler/.temp
-#cat .ensambler/.temp > .ensambler/src/git-hooks/post-merge
+sed "s/@db_container_name/$DB_CONTAINER_NAME/" $environment/.ensambler/src/git-hooks/post-merge > $environment/.ensambler/.temp
+#cat $environment/.ensambler/.temp > $environment/.ensambler/src/git-hooks/post-merge
 
 
-# install file
+# mount file
 sed "
 	s,@repository_url,$REPOSITORY_URL,;
 	s,@repository_dir,$REPOSITORY_DIR,;
 	s,@db_container_name,$DB_CONTAINER_NAME,
-" install > .ensambler/.temp
+" $environment/mount > $environment/.ensambler/.temp
 
-#cat .ensambler/.temp > install
+#cat $environment/.ensambler/.temp > $environment/mount
 
 
 # docker-compose.yml file
@@ -95,9 +103,9 @@ sed "
 	s/@db_container_name/$DB_CONTAINER_NAME/;
 	s/@phpmyadmin_container_name/$PHPMYADMIN_CONTAINER_NAME/;
 	s/@wp_container_name/$WP_CONTAINER_NAME/
-" docker-compose.yml > .ensambler/.temp
+" $environment/docker-compose.yml > $environment/.ensambler/.temp
 
-#cat .ensambler/.temp > docker-compose.yml
+#cat $environment/.ensambler/.temp > $environment/docker-compose.yml
 
 
 # README-sample.md file
@@ -113,29 +121,61 @@ done
 sed "
 	s,@project_name,${PROJECT_NAME:=$PROJECT_NAME_DEFAULT},;
 	s,@developers,${DEVELOPER_LIST%\\*},;
-	s,@install_url,${INSTALL_SHORT_URL:=$INSTALL_RAW_URL},;
+	s,@mount_url,${MOUNT_SHORT_URL:=$MOUNT_RAW_URL},;
 	s,@repository_dir,$REPOSITORY_DIR,;
 	s,@project_alias,${PROJECT_ALIAS:=$REPOSITORY_DIR},g;
 	s,@project_url,${PROJECT_URL:=$PROJECT_URL_DEFAULT},;
 	s/@stack/${STACK:=$STACK_DEFAULT}/;
 	s/@year/$(date +"%Y")/
-" .ensambler/src/README-template.md > .ensambler/.temp
+" $environment/.ensambler/src/README-template.md > $environment/.ensambler/.temp
 
-#cat .ensambler/.temp > .ensambler/src/README-template.md
+#cat $environment/.ensambler/.temp > $environment/.ensambler/src/README-template.md
 
+
+# CLEAN, UPDATE & DELETE
 # --------------------------------------------------------------------------
 
+# clean
+rm $environment/.ensambler/.temp
 
-rm .ensambler/.temp
+# updates README.md
+# rm $environment/README.md
+# mv $environment/.ensambler/src/README-template.md $environment/README.md
 
-# just macOs
-echo "curl -L" ${INSTALL_SHORT_URL:=$INSTALL_RAW_URL} "| sh" | pbcopy
+# rename
+# cd $environment/..
+# mv wordpress-docker-startpoint $REPOSITORY_DIR
+# cd $REPOSITORY_DIR
 
-echo "
-Project * $REPOSITORY_DIR * got Ensambled!
-SHARE IT TO YOUR TEAM: ${INSTALL_SHORT_URL:=$INSTALL_RAW_URL} (copied to clipboard).
-"
 
-exit 0
+# DEPLOY SECTION
+# --------------------------------------------------------------------------
+
+if [ ! -z "$deploy" ] && [[ $deploy == true ]] ; then
+	source $environment/mount --deploy
+
+	# OPERATION MESSAGES
+	# --------------------------------------------------------------------------
+
+	# just macOs
+	echo "curl -L" ${MOUNT_SHORT_URL:=$MOUNT_RAW_URL} "| sh" | pbcopy
+
+	echo "
+	@${USER_NAME:="Deployer"}
+
+	Your Project * $REPOSITORY_DIR * got Ensambled!
+	SHARE IT TO YOUR TEAM: ${MOUNT_SHORT_URL:=$MOUNT_RAW_URL} (copied to clipboard).
+	"
+
+else
+
+	# OPERATION MESSAGE
+	# --------------------------------------------------------------------------
+
+	echo "
+	-> Project \"$REPOSITORY_DIR\" configured.
+	Waiting for Build!
+	"
+fi
 
 #done.
