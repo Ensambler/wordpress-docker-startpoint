@@ -1,0 +1,20 @@
+# git-hooks setup
+
+
+if [[ $0 != "/usr/local/bin/ensamble" ]] ; then
+	echo "Error: you can't use build script directly. Use through ensamble global command."
+	exit 1
+fi
+
+
+environment=${environment:="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"}
+
+echo "build module"
+exit
+cp $environment/.ensambler/src/git-hooks/* $environment/.git/hooks
+
+chmod +x $environment/.git/hooks/pre-commit
+chmod +x $environment/.git/hooks/post-merge
+
+# services & wordpress-setup
+docker-compose up -d

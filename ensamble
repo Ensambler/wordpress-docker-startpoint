@@ -1,9 +1,19 @@
 #!/bin/sh
 
-environment="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-source $environment/.ensambler/lib/readJSON
-source $environment/.ensambler/lib/gitChecker
+if [[ $0 != "/usr/local/bin/ensamble" ]] ; then
+	echo "Error: you can't use ensamble script directly. Use through ensamble global command."
+	exit 1
+fi
+
+echo "ensamble module."
+exit
+
+environment=${working_directory:="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"}
+
+
+source ~/.ensambler/lib/readJSON
+source ~/.ensambler/lib/gitChecker
 
 
 # DEFINE PARAMS PASSED
@@ -26,7 +36,7 @@ while [[ $# > 0 ]] ; do
     esac
 done
 
-
+exit
 # PROJECT.json
 # --------------------------------------------------------------------------
 
@@ -77,7 +87,7 @@ MOUNT_RAW_URL="$(sed "s/github.com/raw.githubusercontent.com/g" <<< $REPOSITORY_
 USER_NAME=`git config --get user.name`
 
 
-# REPLACEMENTS: git-hooks/*, mount, docker-compose.yml, README-sample.md
+# CONFIGURATION: git-hooks/*, mount, docker-compose.yml, README-sample.md
 # --------------------------------------------------------------------------
 
 # .git-hooks files
@@ -152,7 +162,7 @@ rm $environment/.ensambler/.temp
 # --------------------------------------------------------------------------
 
 if [ ! -z "$deploy" ] && [[ $deploy == true ]] ; then
-	source $environment/mount --deploy
+	source $environment/build
 
 	# OPERATION MESSAGES
 	# --------------------------------------------------------------------------
@@ -177,5 +187,6 @@ else
 	Waiting for Build!
 	"
 fi
+
 
 #done.

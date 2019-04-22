@@ -14,6 +14,7 @@ done
 echo $environment
 exit
 
+
 if [ -z "$deploy" ]; then
 	#clone
     echo "mount"
@@ -23,17 +24,11 @@ if [ -z "$deploy" ]; then
 fi
 
 
-# # git-hooks setup
-# cp .ensambler/src/git-hooks/* .git/hooks
-# chmod +x .git/hooks/pre-commit
-# chmod +x .git/hooks/post-merge
+source $environment/build
 
-# # services & wordpress-setup
-# docker-compose up -d
+# database first-import
+cat mysql.sql | docker exec -i @db_container_name /usr/bin/mysql -u wordpress --password=wordpress wordpress
+docker-compose down
 
-# # database first-import
-# cat mysql.sql | docker exec -i @db_container_name /usr/bin/mysql -u wordpress --password=wordpress wordpress
-# docker-compose down
-
-# # unsets
-# unset deploy
+# unsets
+unset deploy
