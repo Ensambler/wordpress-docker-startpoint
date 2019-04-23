@@ -1,4 +1,7 @@
 # GET PARAMS PASSED
+echo "mount"
+exit
+
 while [[ $# > 0 ]] ; do
     case "$1" in
         -d | --deploy )
@@ -11,6 +14,7 @@ while [[ $# > 0 ]] ; do
         ;;
     esac
 done
+
 echo $environment
 exit
 
