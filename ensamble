@@ -6,7 +6,7 @@ if [[ $0 != "/usr/local/bin/ensamble" ]] ; then
 	exit 1
 fi
 
-echo "ensamble module."
+echo "\nensamble module."
 exit
 
 
