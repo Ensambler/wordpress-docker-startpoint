@@ -4,7 +4,7 @@ echo "build module"
 exit
 
 if [[ $0 != "/usr/local/bin/ensamble" ]] ; then
-	echo "Error: you can't use build script directly. Use through ensamble global command."
+	echo "Error: you can't use ensamble script directly. Must use it through ensamble global command."
 	exit 1
 fi
 
