@@ -17,7 +17,6 @@ environment=${working_directory:="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev
 
 
 source ~/.ensambler/lib/readJSON
-source ~/.ensambler/lib/gitChecker
 
 
 # DEFINE PARAMS PASSED
@@ -46,9 +45,6 @@ exit
 
 # (required)
 REPOSITORY_URL=${REPOSITORY_URL:=`readJson $environment/project.json Repository_URL`} || exit
-
-# (check if repository is reachable)
-`gitChecker is_reachable $REPOSITORY_URL` || exit
 
 # (optional)
 PROJECT_NAME=`readJson $environment/project.json Name --optional`
