@@ -10,8 +10,8 @@
 #	2019.
 #	
 #	Github:
-#			@Ensambler
-#			@diegoulloao
+#		@Ensambler
+#		@diegoulloao
 #
 #
 #	Website: http://www.ensambler.cl/ensambler-project
@@ -23,7 +23,7 @@ if [[ $0 != "/usr/local/bin/ensamble" ]] ; then
 	exit 1
 fi
 
-echo -e "\nensamble module.\n"
+echo -e "\nEnsambling...\n"
 exit
 
 
