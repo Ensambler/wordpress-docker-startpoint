@@ -1,12 +1,29 @@
 #!/bin/bash
 
 
+#
+#	ENSAMBLER Wordpress Plug Module.
+#	
+#	Powered by Ensambler®.
+#	Developed by Diego Ulloa.
+#
+#	2019.
+#	
+#	Github:
+#			@Ensambler
+#			@diegoulloao
+#
+#
+#	Website: http://www.ensambler.cl/ensambler-project
+#
+
+
 if [[ $0 != "/usr/local/bin/ensamble" ]] ; then
 	echo "Error: you can't use ensamble script directly. Must use it through ensamble global command."
 	exit 1
 fi
 
-echo -e "\nensamble module."
+echo -e "\nensamble module.\n"
 exit
 
 
