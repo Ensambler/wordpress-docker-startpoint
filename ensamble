@@ -23,7 +23,7 @@ if [[ $0 != "/usr/local/bin/ensamble" ]] ; then
 	exit 1
 fi
 
-echo -e "\nEnsambling...\n"
+
 exit
 
 
